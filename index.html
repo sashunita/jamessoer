@@ -2,178 +2,303 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Тренировочная программа 43 сезона</title>
+  <title>Тренировка: свайп и прогресс</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; margin: 0; color: #222; }
-    header { background: #2d3e50; color: #fff; padding: 2rem 1rem 1rem 1rem; text-align: center; }
-    h1 { margin: 0 0 0.5em 0; }
-    h2 { color: #2d3e50; margin-top: 2em; }
-    .container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #0001; padding: 2rem; }
-    .exercise-block { margin-bottom: 2em; }
-    .exercise-title { font-weight: bold; font-size: 1.1em; margin-bottom: 0.3em; }
-    .exercise-desc { color: #555; margin-bottom: 0.5em; }
-    .input-row { display: flex; gap: 1em; align-items: center; margin-bottom: 0.5em; }
-    .input-row input[type="number"] { width: 70px; padding: 0.3em; border-radius: 4px; border: 1px solid #bbb; }
-    .input-row label { font-size: 0.95em; }
-    .save-btn { background: #2d3e50; color: #fff; border: none; border-radius: 4px; padding: 0.4em 1.2em; cursor: pointer; transition: background 0.2s; }
-    .save-btn:hover { background: #1a2533; }
-    .saved { color: #2d8a34; font-size: 0.95em; margin-left: 1em; }
-    .cardio-block, .note { background: #f0f4fa; border-left: 4px solid #2d3e50; padding: 1em; margin: 2em 0; border-radius: 8px; }
+    body { background: #f7f7fa; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    .main { max-width: 500px; margin: 0 auto; padding: 2em 0; }
+    .exercise-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px #0002;
+      padding: 2em 1em 1.5em 1em;
+      margin-bottom: 2em;
+      text-align: center;
+      position: relative;
+      min-height: 420px;
+      transition: box-shadow 0.2s;
+    }
+    .exercise-title {
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 0.2em;
+      color: #2d3e50;
+    }
+    .exercise-desc {
+      font-size: 1.2em;
+      color: #555;
+      margin-bottom: 1.2em;
+    }
+    .progress-bar-bg {
+      width: 90%;
+      height: 22px;
+      background: #e0e0e0;
+      border-radius: 12px;
+      margin: 1.2em auto 1.5em auto;
+      overflow: hidden;
+      box-shadow: 0 1px 4px #0001;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #2d8a34, #4fc3f7);
+      border-radius: 12px;
+      transition: width 0.4s, background 0.4s;
+    }
+    table {
+      width: 100%;
+      font-size: 1.3em;
+      margin-bottom: 1em;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 0.5em 0.2em;
+      text-align: center;
+    }
+    th {
+      color: #2d3e50;
+      font-weight: 600;
+      font-size: 1.1em;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    td input[type="number"] {
+      width: 80px;
+      font-size: 1.1em;
+      padding: 0.2em 0.4em;
+      border-radius: 6px;
+      border: 1.5px solid #b0bec5;
+      text-align: center;
+      margin-right: 0.2em;
+    }
+    .add-set-btn {
+      background: linear-gradient(90deg, #4fc3f7, #2d8a34);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 2em;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0002;
+      margin: 0.5em auto 0.5em auto;
+      display: block;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .add-set-btn:active { transform: scale(0.95); }
+    .del-set-btn {
+      background: #e57373;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.2em;
+      cursor: pointer;
+      margin-left: 0.3em;
+      vertical-align: middle;
+      transition: background 0.2s;
+    }
+    .del-set-btn:active { background: #c62828; }
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #4fc3f7;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 2em;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0002;
+      z-index: 2;
+      transition: background 0.2s;
+      opacity: 0.85;
+    }
+    .nav-btn:active { background: #0288d1; }
+    .nav-left { left: -24px; }
+    .nav-right { right: -24px; }
     @media (max-width: 600px) {
-      .container { padding: 1em; }
-      .input-row { flex-direction: column; align-items: flex-start; gap: 0.3em; }
+      .main { padding: 0.5em 0; }
+      .exercise-card { min-height: 350px; padding: 1.2em 0.2em 1em 0.2em; }
+      .nav-btn { width: 38px; height: 38px; font-size: 1.5em; }
+      .nav-left { left: -12px; }
+      .nav-right { right: -12px; }
+      table { font-size: 1.1em; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Тренировочная программа 43 сезона</h1>
-    <div>Выберите вариант тренировки и отмечайте свои результаты!</div>
-  </header>
-  <div class="container">
-
-    <h2>Тренировка в тренажёрном зале</h2>
-    <div class="exercise-block" id="gym-1">
-      <div class="exercise-title">1. Тяга сверху узким хватом</div>
-      <div class="exercise-desc">1×15 (разминка, 70%), 1×12 (90%), 1×10 (100%), 2×8–10 (100%)</div>
-      <div id="inputs-gym-1"></div>
-    </div>
-    <div class="exercise-block" id="gym-2">
-      <div class="exercise-title">2. Тяга сверху широким хватом</div>
-      <div class="exercise-desc">3×8 (100%)</div>
-      <div id="inputs-gym-2"></div>
-    </div>
-    <div class="exercise-block" id="gym-3">
-      <div class="exercise-title">3. Тяга Т-грифа в наклоне</div>
-      <div class="exercise-desc">3×10 (100%)</div>
-      <div id="inputs-gym-3"></div>
-    </div>
-    <div class="exercise-block" id="gym-4">
-      <div class="exercise-title">4. Суперсерия: Жим штанги лёжа + Разведение гантелей</div>
-      <div class="exercise-desc">5 суперсерий: жим (1×15–20, 1×12, 1×10, 1×8, 1×6–8), разводки (1×15–20, 1×12, 3×10)</div>
-      <div id="inputs-gym-4"></div>
-    </div>
-    <div class="exercise-block" id="gym-5">
-      <div class="exercise-title">5. Суперсерия на пресс</div>
-      <div class="exercise-desc">3 суперсерии: подъём ног в висе (до отказа), складка сидя (15)</div>
-      <div id="inputs-gym-5"></div>
-    </div>
-    <div class="cardio-block">
-      <b>Кардио (выберите один вариант):</b>
-      <ul>
-        <li>70 этажей подъёма по лестнице (в течение дня)</li>
-        <li>Спокойный бег (3 км, можно с переходом на ходьбу)</li>
-        <li>Эквивалентная замена по расходу энергии</li>
-      </ul>
-      <div class="note">
-        <b>Пульс:</b> 70–75% от максимума (220 минус возраст).<br>
-        Если нет кардиомонитора — измеряйте пульс пальцами на запястье (20 сек × 3).
+  <div class="main">
+    <div id="exercise-card" class="exercise-card">
+      <button class="nav-btn nav-left" id="prev-btn" title="Назад">&#8592;</button>
+      <button class="nav-btn nav-right" id="next-btn" title="Вперёд">&#8594;</button>
+      <div class="exercise-title" id="ex-title"></div>
+      <div class="exercise-desc" id="ex-desc"></div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar" id="progress-bar"></div>
       </div>
-    </div>
-
-    <h2>Тренировка с дополнительным оборудованием</h2>
-    <div class="exercise-block" id="home-1">
-      <div class="exercise-title">1. Подтягивания широким хватом</div>
-      <div class="exercise-desc">4 подхода до отказа (на 10 повторе)</div>
-      <div id="inputs-home-1"></div>
-    </div>
-    <div class="exercise-block" id="home-2">
-      <div class="exercise-title">2. Тяга гантели в наклоне</div>
-      <div class="exercise-desc">1×15 (разминка), 3×10–12 (рабочие)</div>
-      <div id="inputs-home-2"></div>
-    </div>
-    <div class="exercise-block" id="home-3">
-      <div class="exercise-title">3. Жим гантелей лёжа</div>
-      <div class="exercise-desc">1×15–20 (разминка), 4×8–10 (рабочие)</div>
-      <div id="inputs-home-3"></div>
-    </div>
-    <div class="exercise-block" id="home-4">
-      <div class="exercise-title">4. Разведение гантелей на горизонтальной скамье</div>
-      <div class="exercise-desc">1×12 (90%), 3×10 (100%)</div>
-      <div id="inputs-home-4"></div>
-    </div>
-    <div class="exercise-block" id="home-5">
-      <div class="exercise-title">5. Пуловер с гантелью</div>
-      <div class="exercise-desc">4×12 (100%)</div>
-      <div id="inputs-home-5"></div>
-    </div>
-    <div class="exercise-block" id="home-6">
-      <div class="exercise-title">6. Суперсерия на пресс</div>
-      <div class="exercise-desc">3 суперсерии: подъём ног в висе (до отказа), складка сидя (15)</div>
-      <div id="inputs-home-6"></div>
-    </div>
-    <div class="cardio-block">
-      <b>Кардио (выберите один вариант):</b>
-      <ul>
-        <li>70 этажей подъёма по лестнице (в течение дня)</li>
-        <li>Спокойный бег (3 км, можно с переходом на ходьбу)</li>
-        <li>Эквивалентная замена по расходу энергии</li>
-      </ul>
-      <div class="note">
-        <b>Пульс:</b> 70–75% от максимума (220 минус возраст).<br>
-        Если нет кардиомонитора — измеряйте пульс пальцами на запястье (20 сек × 3).
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Подход</th>
+            <th>Вес (кг)</th>
+            <th>Повторения</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="sets-table"></tbody>
+      </table>
+      <button class="add-set-btn" id="add-set-btn" title="Добавить подход">+</button>
     </div>
   </div>
   <script>
-    // Описание подходов для каждого упражнения
-    const exercises = {
-      "gym-1": ["1×15", "1×12", "1×10", "1×8–10", "1×8–10"],
-      "gym-2": ["1×8", "1×8", "1×8"],
-      "gym-3": ["1×10", "1×10", "1×10"],
-      "gym-4": [
-        "Жим: 1×15–20", "Жим: 1×12", "Жим: 1×10", "Жим: 1×8", "Жим: 1×6–8",
-        "Разводки: 1×15–20", "Разводки: 1×12", "Разводки: 1×10", "Разводки: 1×10", "Разводки: 1×10"
-      ],
-      "gym-5": ["1", "2", "3"],
+    // Список упражнений (пример для тренажёрного зала, можно расширить)
+    const exercises = [
+      {
+        title: "Тяга сверху узким хватом",
+        desc: "1×15 (разминка), 1×12, 1×10, 2×8–10",
+        defaultSets: 5
+      },
+      {
+        title: "Тяга сверху широким хватом",
+        desc: "3×8 (100%)",
+        defaultSets: 3
+      },
+      {
+        title: "Тяга Т-грифа в наклоне",
+        desc: "3×10 (100%)",
+        defaultSets: 3
+      },
+      {
+        title: "Суперсерия: Жим штанги лёжа + Разведение гантелей",
+        desc: "5 суперсерий: жим (1×15–20, 1×12, 1×10, 1×8, 1×6–8), разводки (1×15–20, 1×12, 3×10)",
+        defaultSets: 10
+      },
+      {
+        title: "Суперсерия на пресс",
+        desc: "3 суперсерии: подъём ног в висе (до отказа), складка сидя (15)",
+        defaultSets: 3
+      }
+    ];
 
-      "home-1": ["1", "2", "3", "4"],
-      "home-2": ["1×15 (разминка)", "1×10–12", "1×10–12", "1×10–12"],
-      "home-3": ["1×15–20 (разминка)", "1×8–10", "1×8–10", "1×8–10", "1×8–10"],
-      "home-4": ["1×12", "1×10", "1×10", "1×10"],
-      "home-5": ["1×12", "1×12", "1×12", "1×12"],
-      "home-6": ["1", "2", "3"]
-    };
+    let current = 0;
 
-    // Генерация полей ввода для каждого упражнения
-    Object.keys(exercises).forEach(id => {
-      const block = document.getElementById("inputs-" + id);
-      exercises[id].forEach((set, idx) => {
-        const key = id + "-set" + idx;
-        block.innerHTML += `
-          <form class="input-row" onsubmit="return false;">
-            <label>${set}:</label>
-            <input type="number" min="0" placeholder="Вес (кг)" id="${key}-weight">
-            <input type="number" min="0" placeholder="Повторения" id="${key}-reps">
-            <button class="save-btn" onclick="saveSet('${key}')">Сохранить</button>
-            <span class="saved" id="${key}-saved"></span>
-          </form>
+    // Получение/сохранение подходов в localStorage
+    function getSets(idx) {
+      const key = "ex-sets-" + idx;
+      let sets = [];
+      try {
+        sets = JSON.parse(localStorage.getItem(key)) || [];
+      } catch { sets = []; }
+      return sets;
+    }
+    function saveSets(idx, sets) {
+      localStorage.setItem("ex-sets-" + idx, JSON.stringify(sets));
+    }
+
+    // Рендер упражнения
+    function renderExercise() {
+      const ex = exercises[current];
+      document.getElementById("ex-title").textContent = ex.title;
+      document.getElementById("ex-desc").textContent = ex.desc;
+      // Кнопки навигации
+      document.getElementById("prev-btn").style.visibility = current === 0 ? "hidden" : "visible";
+      document.getElementById("next-btn").style.visibility = current === exercises.length - 1 ? "hidden" : "visible";
+      // Таблица подходов
+      let sets = getSets(current);
+      if (sets.length === 0) {
+        sets = Array.from({length: ex.defaultSets}, () => ({weight: "", reps: ""}));
+        saveSets(current, sets);
+      }
+      const tbody = document.getElementById("sets-table");
+      tbody.innerHTML = "";
+      sets.forEach((set, i) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${i+1}</td>
+            <td>
+              <input type="number" min="0" placeholder="Вес" value="${set.weight}"
+                onchange="updateSet(${i},'weight',this.value)">
+            </td>
+            <td>
+              <input type="number" min="0" placeholder="Повт." value="${set.reps}"
+                onchange="updateSet(${i},'reps',this.value)">
+            </td>
+            <td>
+              <button class="del-set-btn" onclick="delSet(${i})" title="Удалить подход">&minus;</button>
+            </td>
+          </tr>
         `;
       });
+      // Прогресс-бар
+      const done = sets.filter(s => s.weight && s.reps).length;
+      const percent = sets.length ? Math.round(100 * done / sets.length) : 0;
+      const bar = document.getElementById("progress-bar");
+      bar.style.width = percent + "%";
+      bar.style.background = percent < 50
+        ? "linear-gradient(90deg, #e57373, #ffd54f)"
+        : percent < 100
+          ? "linear-gradient(90deg, #ffd54f, #4fc3f7)"
+          : "linear-gradient(90deg, #2d8a34, #4fc3f7)";
+    }
+
+    // Добавить подход
+    document.getElementById("add-set-btn").onclick = function() {
+      const sets = getSets(current);
+      sets.push({weight: "", reps: ""});
+      saveSets(current, sets);
+      renderExercise();
+    };
+    // Удалить подход
+    window.delSet = function(idx) {
+      let sets = getSets(current);
+      sets.splice(idx, 1);
+      saveSets(current, sets);
+      renderExercise();
+    };
+    // Обновить подход
+    window.updateSet = function(idx, field, value) {
+      let sets = getSets(current);
+      sets[idx][field] = value;
+      saveSets(current, sets);
+      renderExercise();
+    };
+
+    // Навигация
+    document.getElementById("prev-btn").onclick = function() {
+      if (current > 0) { current--; renderExercise(); }
+    };
+    document.getElementById("next-btn").onclick = function() {
+      if (current < exercises.length - 1) { current++; renderExercise(); }
+    };
+
+    // Свайпы (touch и мышь)
+    let startX = null;
+    const card = document.getElementById("exercise-card");
+    card.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+    card.addEventListener('touchend', e => {
+      if (startX === null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if (dx > 60 && current > 0) { current--; renderExercise(); }
+      if (dx < -60 && current < exercises.length - 1) { current++; renderExercise(); }
+      startX = null;
+    });
+    // Мышь (для ПК)
+    let mouseDownX = null;
+    card.addEventListener('mousedown', e => { mouseDownX = e.clientX; });
+    card.addEventListener('mouseup', e => {
+      if (mouseDownX === null) return;
+      const dx = e.clientX - mouseDownX;
+      if (dx > 60 && current > 0) { current--; renderExercise(); }
+      if (dx < -60 && current < exercises.length - 1) { current++; renderExercise(); }
+      mouseDownX = null;
     });
 
-    // Сохранение и восстановление данных
-    function saveSet(key) {
-      const weight = document.getElementById(key + "-weight").value;
-      const reps = document.getElementById(key + "-reps").value;
-      localStorage.setItem(key, JSON.stringify({weight, reps}));
-      document.getElementById(key + "-saved").textContent = "Сохранено!";
-      setTimeout(() => { document.getElementById(key + "-saved").textContent = ""; }, 1500);
-    }
-    window.onload = function() {
-      Object.keys(exercises).forEach(id => {
-        exercises[id].forEach((set, idx) => {
-          const key = id + "-set" + idx;
-          const data = localStorage.getItem(key);
-          if (data) {
-            const {weight, reps} = JSON.parse(data);
-            if (weight) document.getElementById(key + "-weight").value = weight;
-            if (reps) document.getElementById(key + "-reps").value = reps;
-          }
-        });
-      });
-    }
+    // Первый рендер
+    renderExercise();
   </script>
 </body>
 </html>
