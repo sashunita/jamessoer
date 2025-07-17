@@ -1,1 +1,135 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minimal One Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f9f9f9;
+      --accent: #4f46e5;
+      --text: #1f2937;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      position: fixed;
+      width: 100%;
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      z-index: 1000;
+    }
+
+    nav a {
+      margin: 0 1rem;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav a.active, nav a:hover {
+      color: var(--accent);
+    }
+
+    section {
+      min-height: 100vh;
+      padding: 8rem 2rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: #eee;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+      nav a { margin: 0 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div><strong>MySite</strong></div>
+    <nav>
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#projects" class="nav-link">Projects</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home"><div><h1>Welcome</h1><p>This is a minimalist one-page site.</p></div></section>
+    <section id="about"><div><h1>About Me</h1><p>A short description goes here.</p></div></section>
+    <section id="projects"><div><h1>Projects</h1><p>Some cool things I’ve built.</p></div></section>
+    <section id="contact"><div><h1>Contact</h1><p>Get in touch: email@example.com</p></div></section>
+  </main>
+
+  <footer>
+    &copy; 2025 MySite. All rights reserved.
+  </footer>
+
+  <script>
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+
+          // Highlight menu
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').slice(1) === entry.target.id) {
+              link.classList.add('active');
+            }
+          });
+        }
+      });
+    }, { threshold: 0.5 });
+
+    sections.forEach(section => {
+      observer.observe(section);
+    });
+  </script>
+</body>
+</html>
