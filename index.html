@@ -1,45 +1,178 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width">
-<title>Калькулятор калорий + Nous AI</title>
-<style>
-  body{font-family:sans-serif;padding:20px;background:#f5f5f5;}
-  input,button{padding:10px;margin:5px;font-size:1rem;}
-  table{width:100%;border-collapse:collapse;margin-top:20px;}
-  th,td{padding:8px;border:1px solid #ccc;text-align:center;}
-  #loading{display:none;color:green;}
-</style>
+<head>
+  <meta charset="UTF-8">
+  <title>Тренировочная программа 43 сезона</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; margin: 0; color: #222; }
+    header { background: #2d3e50; color: #fff; padding: 2rem 1rem 1rem 1rem; text-align: center; }
+    h1 { margin: 0 0 0.5em 0; }
+    h2 { color: #2d3e50; margin-top: 2em; }
+    .container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #0001; padding: 2rem; }
+    .exercise-block { margin-bottom: 2em; }
+    .exercise-title { font-weight: bold; font-size: 1.1em; margin-bottom: 0.3em; }
+    .exercise-desc { color: #555; margin-bottom: 0.5em; }
+    .input-row { display: flex; gap: 1em; align-items: center; margin-bottom: 0.5em; }
+    .input-row input[type="number"] { width: 70px; padding: 0.3em; border-radius: 4px; border: 1px solid #bbb; }
+    .input-row label { font-size: 0.95em; }
+    .save-btn { background: #2d3e50; color: #fff; border: none; border-radius: 4px; padding: 0.4em 1.2em; cursor: pointer; transition: background 0.2s; }
+    .save-btn:hover { background: #1a2533; }
+    .saved { color: #2d8a34; font-size: 0.95em; margin-left: 1em; }
+    .cardio-block, .note { background: #f0f4fa; border-left: 4px solid #2d3e50; padding: 1em; margin: 2em 0; border-radius: 8px; }
+    @media (max-width: 600px) {
+      .container { padding: 1em; }
+      .input-row { flex-direction: column; align-items: flex-start; gap: 0.3em; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Калькулятор калорий (Nous AI)</h1>
-  <input id="prod" placeholder="Название продукта">
-  <input id="g" type="number" value="100">
-  <button onclick="add()">Добавить</button>
-  <span id="loading">Загрузка...</span>
-  <table><thead><tr><th>Продукт</th><th>г</th><th>Белки</th><th>Жиры</th><th>Углеводы</th><th>Ккал</th></tr></thead>
-  <tbody id="tb"></tbody></table>
+  <header>
+    <h1>Тренировочная программа 43 сезона</h1>
+    <div>Выберите вариант тренировки и отмечайте свои результаты!</div>
+  </header>
+  <div class="container">
 
+    <h2>Тренировка в тренажёрном зале</h2>
+    <div class="exercise-block" id="gym-1">
+      <div class="exercise-title">1. Тяга сверху узким хватом</div>
+      <div class="exercise-desc">1×15 (разминка, 70%), 1×12 (90%), 1×10 (100%), 2×8–10 (100%)</div>
+      <div id="inputs-gym-1"></div>
+    </div>
+    <div class="exercise-block" id="gym-2">
+      <div class="exercise-title">2. Тяга сверху широким хватом</div>
+      <div class="exercise-desc">3×8 (100%)</div>
+      <div id="inputs-gym-2"></div>
+    </div>
+    <div class="exercise-block" id="gym-3">
+      <div class="exercise-title">3. Тяга Т-грифа в наклоне</div>
+      <div class="exercise-desc">3×10 (100%)</div>
+      <div id="inputs-gym-3"></div>
+    </div>
+    <div class="exercise-block" id="gym-4">
+      <div class="exercise-title">4. Суперсерия: Жим штанги лёжа + Разведение гантелей</div>
+      <div class="exercise-desc">5 суперсерий: жим (1×15–20, 1×12, 1×10, 1×8, 1×6–8), разводки (1×15–20, 1×12, 3×10)</div>
+      <div id="inputs-gym-4"></div>
+    </div>
+    <div class="exercise-block" id="gym-5">
+      <div class="exercise-title">5. Суперсерия на пресс</div>
+      <div class="exercise-desc">3 суперсерии: подъём ног в висе (до отказа), складка сидя (15)</div>
+      <div id="inputs-gym-5"></div>
+    </div>
+    <div class="cardio-block">
+      <b>Кардио (выберите один вариант):</b>
+      <ul>
+        <li>70 этажей подъёма по лестнице (в течение дня)</li>
+        <li>Спокойный бег (3 км, можно с переходом на ходьбу)</li>
+        <li>Эквивалентная замена по расходу энергии</li>
+      </ul>
+      <div class="note">
+        <b>Пульс:</b> 70–75% от максимума (220 минус возраст).<br>
+        Если нет кардиомонитора — измеряйте пульс пальцами на запястье (20 сек × 3).
+      </div>
+    </div>
+
+    <h2>Тренировка с дополнительным оборудованием</h2>
+    <div class="exercise-block" id="home-1">
+      <div class="exercise-title">1. Подтягивания широким хватом</div>
+      <div class="exercise-desc">4 подхода до отказа (на 10 повторе)</div>
+      <div id="inputs-home-1"></div>
+    </div>
+    <div class="exercise-block" id="home-2">
+      <div class="exercise-title">2. Тяга гантели в наклоне</div>
+      <div class="exercise-desc">1×15 (разминка), 3×10–12 (рабочие)</div>
+      <div id="inputs-home-2"></div>
+    </div>
+    <div class="exercise-block" id="home-3">
+      <div class="exercise-title">3. Жим гантелей лёжа</div>
+      <div class="exercise-desc">1×15–20 (разминка), 4×8–10 (рабочие)</div>
+      <div id="inputs-home-3"></div>
+    </div>
+    <div class="exercise-block" id="home-4">
+      <div class="exercise-title">4. Разведение гантелей на горизонтальной скамье</div>
+      <div class="exercise-desc">1×12 (90%), 3×10 (100%)</div>
+      <div id="inputs-home-4"></div>
+    </div>
+    <div class="exercise-block" id="home-5">
+      <div class="exercise-title">5. Пуловер с гантелью</div>
+      <div class="exercise-desc">4×12 (100%)</div>
+      <div id="inputs-home-5"></div>
+    </div>
+    <div class="exercise-block" id="home-6">
+      <div class="exercise-title">6. Суперсерия на пресс</div>
+      <div class="exercise-desc">3 суперсерии: подъём ног в висе (до отказа), складка сидя (15)</div>
+      <div id="inputs-home-6"></div>
+    </div>
+    <div class="cardio-block">
+      <b>Кардио (выберите один вариант):</b>
+      <ul>
+        <li>70 этажей подъёма по лестнице (в течение дня)</li>
+        <li>Спокойный бег (3 км, можно с переходом на ходьбу)</li>
+        <li>Эквивалентная замена по расходу энергии</li>
+      </ul>
+      <div class="note">
+        <b>Пульс:</b> 70–75% от максимума (220 минус возраст).<br>
+        Если нет кардиомонитора — измеряйте пульс пальцами на запястье (20 сек × 3).
+      </div>
+    </div>
+  </div>
   <script>
-    async function add(){
-      const name = document.getElementById('prod').value;
-      const grams = +document.getElementById('g').value;
-      if(!name||!grams) return alert('Введите данные');
-      document.getElementById('loading').style.display='inline';
-      try{
-        const res = await fetch('http://localhost:3000/api/nutrition',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({product:name, grams})
+    // Описание подходов для каждого упражнения
+    const exercises = {
+      "gym-1": ["1×15", "1×12", "1×10", "1×8–10", "1×8–10"],
+      "gym-2": ["1×8", "1×8", "1×8"],
+      "gym-3": ["1×10", "1×10", "1×10"],
+      "gym-4": [
+        "Жим: 1×15–20", "Жим: 1×12", "Жим: 1×10", "Жим: 1×8", "Жим: 1×6–8",
+        "Разводки: 1×15–20", "Разводки: 1×12", "Разводки: 1×10", "Разводки: 1×10", "Разводки: 1×10"
+      ],
+      "gym-5": ["1", "2", "3"],
+
+      "home-1": ["1", "2", "3", "4"],
+      "home-2": ["1×15 (разминка)", "1×10–12", "1×10–12", "1×10–12"],
+      "home-3": ["1×15–20 (разминка)", "1×8–10", "1×8–10", "1×8–10", "1×8–10"],
+      "home-4": ["1×12", "1×10", "1×10", "1×10"],
+      "home-5": ["1×12", "1×12", "1×12", "1×12"],
+      "home-6": ["1", "2", "3"]
+    };
+
+    // Генерация полей ввода для каждого упражнения
+    Object.keys(exercises).forEach(id => {
+      const block = document.getElementById("inputs-" + id);
+      exercises[id].forEach((set, idx) => {
+        const key = id + "-set" + idx;
+        block.innerHTML += `
+          <form class="input-row" onsubmit="return false;">
+            <label>${set}:</label>
+            <input type="number" min="0" placeholder="Вес (кг)" id="${key}-weight">
+            <input type="number" min="0" placeholder="Повторения" id="${key}-reps">
+            <button class="save-btn" onclick="saveSet('${key}')">Сохранить</button>
+            <span class="saved" id="${key}-saved"></span>
+          </form>
+        `;
+      });
+    });
+
+    // Сохранение и восстановление данных
+    function saveSet(key) {
+      const weight = document.getElementById(key + "-weight").value;
+      const reps = document.getElementById(key + "-reps").value;
+      localStorage.setItem(key, JSON.stringify({weight, reps}));
+      document.getElementById(key + "-saved").textContent = "Сохранено!";
+      setTimeout(() => { document.getElementById(key + "-saved").textContent = ""; }, 1500);
+    }
+    window.onload = function() {
+      Object.keys(exercises).forEach(id => {
+        exercises[id].forEach((set, idx) => {
+          const key = id + "-set" + idx;
+          const data = localStorage.getItem(key);
+          if (data) {
+            const {weight, reps} = JSON.parse(data);
+            if (weight) document.getElementById(key + "-weight").value = weight;
+            if (reps) document.getElementById(key + "-reps").value = reps;
+          }
         });
-        const j = await res.json();
-        const row = `<tr>
-          <td>${name}</td><td>${grams}</td>
-          <td>${j.proteins}</td><td>${j.fat}</td>
-          <td>${j.carbs}</td><td>${j.calories}</td>
-        </tr>`;
-        document.getElementById('tb').innerHTML+=row;
-      } catch(e){ alert('Ошибка: '+e.message); }
-      document.getElementById('loading').style.display='none';
+      });
     }
   </script>
 </body>
