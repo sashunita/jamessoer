@@ -5,8 +5,16 @@
   <title>Тренировка: карта и прогресс</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { background: #f7f7fa; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-    .layout { display: flex; max-width: 900px; margin: 0 auto; min-height: 100vh; }
+    html, body { height: 100%; }
+    body { background: #f7f7fa; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; }
+    .layout {
+      display: flex;
+      max-width: 900px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: none;
+      transition: flex-direction 0.3s;
+    }
     .sidebar {
       width: 220px;
       background: #fff;
@@ -16,6 +24,8 @@
       flex-direction: column;
       align-items: flex-end;
       min-width: 120px;
+      transition: width 0.3s, border 0.3s;
+      z-index: 10;
     }
     .ex-map {
       display: flex;
@@ -36,6 +46,7 @@
       transition: background 0.2s, color 0.2s;
       position: relative;
       min-width: 90px;
+      user-select: none;
     }
     .ex-map-item.active {
       background: linear-gradient(90deg, #4fc3f7 60%, #fff 100%);
@@ -63,6 +74,7 @@
       align-items: center;
       padding: 2.5em 1em 1em 1em;
       min-width: 0;
+      transition: padding 0.3s;
     }
     .exercise-title {
       font-size: 2em;
@@ -70,6 +82,7 @@
       color: #2d3e50;
       text-align: center;
       margin-bottom: 2em;
+      user-select: none;
     }
     .progress-container {
       position: relative;
@@ -80,6 +93,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      touch-action: pan-y;
+      user-select: none;
     }
     .progress-bar-bg {
       position: absolute;
@@ -101,7 +116,7 @@
       border-radius: 4px;
       transform: translateY(-50%);
       z-index: 2;
-      transition: width 0.3s;
+      transition: width 0.4s cubic-bezier(.4,1.4,.6,1), background 0.4s;
     }
     .progress-dot {
       position: absolute;
@@ -112,17 +127,24 @@
       background: #fff;
       border: 4px solid #e0e0e0;
       box-shadow: 0 2px 8px #0001;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(1);
       z-index: 3;
       cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
       display: flex;
       align-items: center;
       justify-content: center;
+      will-change: transform;
     }
+    .progress-dot:active { transform: translate(-50%, -50%) scale(0.93);}
     .progress-dot.done {
       background: #2d8a34;
       border-color: #2d8a34;
+      animation: pop 0.25s;
+    }
+    @keyframes pop {
+      0% { transform: translate(-50%, -50%) scale(1.2);}
+      100% { transform: translate(-50%, -50%) scale(1);}
     }
     .progress-dot .dot-num {
       color: #fff;
@@ -141,20 +163,44 @@
       white-space: nowrap;
       text-align: center;
       user-select: none;
+      pointer-events: none;
     }
     .exercise-desc {
       font-size: 1.2em;
       color: #555;
       text-align: center;
       margin-bottom: 2em;
+      user-select: none;
     }
-    @media (max-width: 800px) {
+    /* --- Мобильная адаптация --- */
+    @media (max-width: 700px) {
       .layout { flex-direction: column; }
-      .sidebar { flex-direction: row; width: 100%; min-width: 0; border-right: none; border-bottom: 1.5px solid #e0e0e0; padding: 0.5em 0.2em 0.5em 0.2em; }
-      .ex-map { flex-direction: row; gap: 0.7em; margin: 0 auto; width: 100%; justify-content: center; }
-      .ex-map-item { border-radius: 8px 8px 0 0; min-width: 60px; padding: 0.2em 0.5em; }
-    }
-    @media (max-width: 600px) {
+      .sidebar {
+        width: 100vw;
+        min-width: 0;
+        border-right: none;
+        border-bottom: 1.5px solid #e0e0e0;
+        padding: 0.5em 0.2em 0.5em 0.2em;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: #fff;
+      }
+      .ex-map {
+        flex-direction: row;
+        gap: 0.7em;
+        margin: 0 auto;
+        width: 100%;
+        justify-content: center;
+        align-items: flex-end;
+      }
+      .ex-map-item {
+        border-radius: 8px 8px 0 0;
+        min-width: 60px;
+        padding: 0.2em 0.5em;
+        font-size: 1em;
+      }
       .main { padding: 1.2em 0.2em 0.5em 0.2em; }
       .progress-container { height: 60px; }
       .progress-dot { width: 30px; height: 30px; }
@@ -326,7 +372,56 @@
       renderProgress();
     }
 
+    // --- Свайпы для переключения упражнений ---
+    let touchStartX = null;
+    let touchStartY = null;
+    let mouseDownX = null;
+    let mouseDownY = null;
+    const container = document.getElementById("progress-container");
+
+    // Touch events
+    container.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    });
+    container.addEventListener('touchend', e => {
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0 && current < exercises.length - 1) { current++; renderAll(); }
+        if (dx > 0 && current > 0) { current--; renderAll(); }
+      }
+      touchStartX = null; touchStartY = null;
+    });
+
+    // Mouse events (для ПК)
+    container.addEventListener('mousedown', e => {
+      mouseDownX = e.clientX;
+      mouseDownY = e.clientY;
+    });
+    container.addEventListener('mouseup', e => {
+      if (mouseDownX === null) return;
+      const dx = e.clientX - mouseDownX;
+      const dy = e.clientY - mouseDownY;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0 && current < exercises.length - 1) { current++; renderAll(); }
+        if (dx > 0 && current > 0) { current--; renderAll(); }
+      }
+      mouseDownX = null; mouseDownY = null;
+    });
+
+    // Клавиши влево/вправо
+    window.addEventListener('keydown', e => {
+      if (e.key === "ArrowLeft" && current > 0) { current--; renderAll(); }
+      if (e.key === "ArrowRight" && current < exercises.length - 1) { current++; renderAll(); }
+    });
+
+    // Перерисовка при изменении размера
     window.addEventListener('resize', renderProgress);
+
     renderAll();
   </script>
 </body>
