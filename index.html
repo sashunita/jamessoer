@@ -1,130 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cube & Snake Game</title>
-  <style>
-    body {
-      margin: 0;
-      background: #111;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      color: white;
-      font-family: sans-serif;
-      overflow: hidden;
-    }
-
-    #container {
-      text-align: center;
-    }
-
-    .cube {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 30px;
-      background: linear-gradient(45deg, #4f46e5, #22d3ee);
-      transform: rotateX(45deg) rotateY(45deg);
-      animation: spin 5s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotateX(0) rotateY(0); }
-      100% { transform: rotateX(360deg) rotateY(360deg); }
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 1rem;
-      background: #22d3ee;
-      color: #000;
-      border: none;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #0ea5e9;
-    }
-
-    canvas {
-      display: none;
-      background: #000;
-      margin-top: 20px;
-      border: 2px solid white;
-    }
-  </style>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width">
+<title>Калькулятор калорий + Nous AI</title>
+<style>
+  body{font-family:sans-serif;padding:20px;background:#f5f5f5;}
+  input,button{padding:10px;margin:5px;font-size:1rem;}
+  table{width:100%;border-collapse:collapse;margin-top:20px;}
+  th,td{padding:8px;border:1px solid #ccc;text-align:center;}
+  #loading{display:none;color:green;}
+</style>
 </head>
 <body>
-  <div id="container">
-    <div class="cube"></div>
-    <button onclick="startGame()">Начать играть</button>
-    <canvas id="game" width="300" height="300"></canvas>
-  </div>
+  <h1>Калькулятор калорий (Nous AI)</h1>
+  <input id="prod" placeholder="Название продукта">
+  <input id="g" type="number" value="100">
+  <button onclick="add()">Добавить</button>
+  <span id="loading">Загрузка...</span>
+  <table><thead><tr><th>Продукт</th><th>г</th><th>Белки</th><th>Жиры</th><th>Углеводы</th><th>Ккал</th></tr></thead>
+  <tbody id="tb"></tbody></table>
 
   <script>
-    function startGame() {
-      document.querySelector('.cube').style.display = 'none';
-      document.querySelector('button').style.display = 'none';
-      const canvas = document.getElementById('game');
-      const ctx = canvas.getContext('2d');
-      canvas.style.display = 'block';
-
-      const gridSize = 20;
-      let snake = [{ x: 160, y: 160 }];
-      let direction = { x: gridSize, y: 0 };
-      let apple = spawnApple();
-      let gameOver = false;
-
-      function spawnApple() {
-        const x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
-        const y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
-        return { x, y };
-      }
-
-      function gameLoop() {
-        if (gameOver) return;
-
-        const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-
-        if (
-          head.x < 0 || head.x >= canvas.width ||
-          head.y < 0 || head.y >= canvas.height ||
-          snake.some(segment => segment.x === head.x && segment.y === head.y)
-        ) {
-          alert("Game Over!");
-          location.reload();
-          return;
-        }
-
-        snake.unshift(head);
-        if (head.x === apple.x && head.y === apple.y) {
-          apple = spawnApple();
-        } else {
-          snake.pop();
-        }
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'lime';
-        snake.forEach(segment => ctx.fillRect(segment.x, segment.y, gridSize - 2, gridSize - 2));
-
-        ctx.fillStyle = 'red';
-        ctx.fillRect(apple.x, apple.y, gridSize - 2, gridSize - 2);
-      }
-
-      setInterval(gameLoop, 100);
-
-      document.addEventListener('keydown', e => {
-        switch (e.key) {
-          case 'ArrowUp': if (direction.y === 0) direction = { x: 0, y: -gridSize }; break;
-          case 'ArrowDown': if (direction.y === 0) direction = { x: 0, y: gridSize }; break;
-          case 'ArrowLeft': if (direction.x === 0) direction = { x: -gridSize, y: 0 }; break;
-          case 'ArrowRight': if (direction.x === 0) direction = { x: gridSize, y: 0 }; break;
-        }
-      });
+    async function add(){
+      const name = document.getElementById('prod').value;
+      const grams = +document.getElementById('g').value;
+      if(!name||!grams) return alert('Введите данные');
+      document.getElementById('loading').style.display='inline';
+      try{
+        const res = await fetch('http://localhost:3000/api/nutrition',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({product:name, grams})
+        });
+        const j = await res.json();
+        const row = `<tr>
+          <td>${name}</td><td>${grams}</td>
+          <td>${j.proteins}</td><td>${j.fat}</td>
+          <td>${j.carbs}</td><td>${j.calories}</td>
+        </tr>`;
+        document.getElementById('tb').innerHTML+=row;
+      } catch(e){ alert('Ошибка: '+e.message); }
+      document.getElementById('loading').style.display='none';
     }
   </script>
 </body>
